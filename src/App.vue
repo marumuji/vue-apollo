@@ -2,28 +2,18 @@
 // This starter template is using Vue 3 <script setup> SFCs
 // Check out https://vuejs.org/api/sfc-script-setup.html#script-setup
 // import HelloWorld from './components/HelloWorld.vue'
-import { ref } from 'vue';
-const books = ref([]);
 
-const fetchBooks = async () => {
-  const response = await fetch('http://localhost:4000', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      query: `query{
-                books{
-                  title
-                  author
-                }
-              }`,
-    }),
-  });
-  const { data } = await response.json();
-  books.value = data.books;
-};
+import { useQuery } from '@vue/apollo-composable'
+import gql from 'graphql-tag'
 
-fetchBooks();
-
+const { result } = useQuery(gql`
+  query {
+    books {
+      title
+      author
+    }
+  }
+`)
 </script>
 
 <template>
@@ -32,8 +22,8 @@ fetchBooks();
   <HelloWorld msg="Hello Vue 3 + Vite" />
   -->
   <h1>Fetchを利用したGraphQLへのアクセス</h1>
-  <ul>
-    <li v-for="(book, index) in books" :key="index">
+  <ul v-if="result && result.books">
+    <li v-for="(book, index) in result.books" :key="index">
       {{ book.title}}/{{ book.author }}
     </li>
   </ul>
